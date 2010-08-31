@@ -1,0 +1,57 @@
+html,
+body{
+	height:100%;
+	width:100%;
+	background-color:#333; font-family:arial,verdana,sans-serif; margin:0; padding:0;
+	color:#eee;
+}
+
+head{display:block;}
+title{display:block; height:45px; padding:0px 2em; background-color:#fc0; margin:0 auto; font-size:32px; font-weight:bold; color:#333;}
+
+#box {
+	position:absolute;
+	top:100px;
+	left:400px;
+	height:500px;
+	width:500px;
+	border:2px solid #ccc;
+	background-color:#000;
+	overflow:hidden;
+}
+
+#box.boom {
+	background-color:#FFFACD;
+}
+
+
+.hexozoa {
+	display:block;
+	position:absolute;
+	top:100px;
+	left:200px;
+	height:16px;
+	width:10px;
+		height:10px;
+		width:16px;
+	-moz-border-radius:10px;
+	-webkit-border-radius:10px;
+	border-radius:10px;
+	background:#F5A550;
+}
+
+.kill {
+	background-color:#000;
+}
+
+
+
+
+
+
+
+
+
+
+
+
