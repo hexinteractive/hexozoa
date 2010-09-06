@@ -100,39 +100,74 @@ Hexozoa.prototype.interpret = function(hexgene) {
 }
 
 
-window.creatures = [];
-window.genesis = function genesis(seedSize) {
-	seedSize = window.creatures.length + seedSize + 1;
-	for(var i=window.creatures.length; i<seedSize; i++) {
-		
-		var numberOfGenes = 2;
-		var hexgenes = [];
-		for(var hG=0; hG<=1; hG++) {
-			hexgenes[hG] = randomHexgene();
+window.bioreactor = {
+	height: $('#box').height(),
+	width: $('#box').width(),
+	creatures: [],
+	randomHexgene: function() {
+			return '#'+ (parseInt(Math.random() * 255, 10)).toString(16) + (parseInt(Math.random() * 255, 10)).toString(16) + (parseInt(Math.random() * 255, 10)).toString(16);
+	},
+	genesis: function(seedSize) {
+		seedSize = bioreactor.creatures.length + seedSize + 1;
+		for(var i=bioreactor.creatures.length; i<seedSize; i++) {
+
+			var numberOfGenes = 2;
+			var hexgenes = [];
+			for(var hG=0; hG<=1; hG++) {
+				hexgenes[hG] = randomHexgene();
+			}
+			bioreactor.creatures[i] = new Hexozoa(hexgenes.join(''));
+			bioreactor.creatures[i].swim();
 		}
-		window.creatures[i] = new Hexozoa(hexgenes.join(''));
-		window.creatures[i].swim();
+	},
+	ele: function() {/* Extinction-Level Event */
+		$(bioreactor.creatures).each(function(index){
+			bioreactor.creatures[index].element.addClass('kill');
+			delete bioreactor.creatures[index].element;
+		});
+
+		$('#box').addClass('boom');
+		setTimeout(function(){$('.kill').remove()},100);
+		setTimeout(function(){$('#box').removeClass('boom')},100);
+		bioreactor.creatures = [];
 	}
-} 
-genesis(20);
-
-window.ele = function ele () { /* Extinction-Level Event */
-	$(window.creatures).each(function(index){
-		window.creatures[index].element.addClass('kill');
-		delete window.creatures[index].element;
-	});
 	
-	$('#box').addClass('boom');
-	setTimeout(function(){$('.kill').remove()},100);
-	setTimeout(function(){$('#box').removeClass('boom')},100);
-	window.creatures = [];
-}
+	
+};
+
+// window.creatures = [];
+// window.genesis = function genesis(seedSize) {
+// 	seedSize = window.creatures.length + seedSize + 1;
+// 	for(var i=window.creatures.length; i<seedSize; i++) {
+// 		
+// 		var numberOfGenes = 2;
+// 		var hexgenes = [];
+// 		for(var hG=0; hG<=1; hG++) {
+// 			hexgenes[hG] = randomHexgene();
+// 		}
+// 		window.creatures[i] = new Hexozoa(hexgenes.join(''));
+// 		window.creatures[i].swim();
+// 	}
+// } 
+// genesis(20);
+
+// window.ele = function ele () { /* Extinction-Level Event */
+// 	$(window.creatures).each(function(index){
+// 		window.creatures[index].element.addClass('kill');
+// 		delete window.creatures[index].element;
+// 	});
+// 	
+// 	$('#box').addClass('boom');
+// 	setTimeout(function(){$('.kill').remove()},100);
+// 	setTimeout(function(){$('#box').removeClass('boom')},100);
+// 	window.creatures = [];
+// }
 
 
 
 
-
-	$('#btn_genesis').click(function(){genesis(20)});
-	$('#btn_ele').click(ele);
+	bioreactor.genesis(20);
+	$('#btn_genesis').click(function(){bioreactor.genesis(20)});
+	$('#btn_ele').click(bioreactor.ele);
 
 });
