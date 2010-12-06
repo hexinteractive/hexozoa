@@ -58,20 +58,6 @@ Hexozoa.prototype.swim = function(radian){
 	//ra_2_de = value * (180 / pi);
 	//de_2_ra = value * (pi / 180);
 		
-	var minEdge = dist;
-	var minPos = Math.min(Math.min(top,left), minEdge);
-	if( minPos != minEdge) {//find the lowest coord value then find the lowest value between the lowest coord and minEdge if outcome isnt equal to minEdge then 
-		dist = 1;
-		alpha = (radian = radian + ((Math.random() - 0.5) * 1.5) );
-	}
-
-	var maxEdge = bioreactor.width - dist;//assuming height & width are always equal I used width
-	if( Math.max(maxEdge, Math.max(top,left)) != maxEdge) {
-		dist = 1;
-		alpha = (radian = radian + ((Math.random() - 0.5) * 1.5) );
-	}
-	
-	
 	
 
 		
@@ -92,6 +78,26 @@ Hexozoa.prototype.swim = function(radian){
 	}
 	console.log(triangle);
 	*/
+	
+	
+	var minEdge = dist;
+	var minPos = Math.min(Math.min(top,left), minEdge);
+	if( minPos != minEdge) {//find the lowest coord value then find the lowest value between the lowest coord and minEdge if outcome isnt equal to minEdge then 
+		//dist = 1;
+		a = (a < 0) ? 0 : a;
+		b = (b < 0) ? 0 : b;
+		alpha = (radian = radian + ((Math.random() - 0.5) * 1.5) );
+	}
+
+	var maxEdge = bioreactor.width - dist;//assuming height & width are always equal I used width
+	if( Math.max(maxEdge, Math.max(top,left)) != maxEdge) {
+		//dist = 1;
+		a = (a > 0) ? 0 : a;
+		b = (b > 0) ? 0 : b;
+		alpha = (radian = radian + ((Math.random() - 0.5) * 1.5) );
+	}
+	
+	
 	
 	$(this.element).animate({'top':(top+a), 'left':(left+b)}, {'duration':dur, 'easing':'easeInOutElastic', 'complete': (function(){self.swim(radian)}) })
 	
@@ -151,7 +157,7 @@ window.bioreactor = {
 };
 
 	//LET THERE BE LIFE
-	bioreactor.genesis();
+	//bioreactor.genesis();
 
 //interface
 	$('#btn_genesis').click(function(){bioreactor.genesis()});
