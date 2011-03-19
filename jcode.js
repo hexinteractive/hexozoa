@@ -20,7 +20,7 @@ function Hexozoa(hexgenes) {
 	this.health = 1;
 	this.color = this.hexgenes[0];
 	this.element = (function(self) {
-		return ($('<i id="'+ this.id +'" class="hexozoa" style="background-color:#'+ this.color +';"></i>').css({
+		return ($('<i id="'+ self.id +'" class="hexozoa" style="background-color:#'+ self.color +';"></i>').css({
 			'background-color': function(){return '#'+self.color;},
 			'top': function(){return parseInt(Math.random() * bioreactor.height) },
 			'left': function(){return parseInt(Math.random() * bioreactor.width) }
@@ -37,6 +37,8 @@ Hexozoa.prototype.swim = function(radian){
 	var dur = (Math.random() * 200) + info.g;
 	var dist = parseInt(info.b/25,10);
 	var self = this;
+	//decrease health a bit 
+	this.health -= 0.00001;
 	
 	//var alpha = -45 * (Math.PI/180);
 	//if a radian was passed into the swim func then use it else generate a random angle (6.2rad is the complete circle)
@@ -118,12 +120,16 @@ Hexozoa.prototype.interpret = function(hexgene) {
 	}
 	return rgb;
 }
+Hexozoa.prototype.eat = function(){
+	//eat to increase health
+}
 
 
 window.bioreactor = {
 	height: $('#box').height(),
 	width: $('#box').width(),
 	creatures: [],
+	stalking: null,
 	randomHexgene: function() {
 			return '#'+ (parseInt(Math.random() * 255, 10)).toString(16) + (parseInt(Math.random() * 255, 10)).toString(16) + (parseInt(Math.random() * 255, 10)).toString(16);
 	},
@@ -151,6 +157,13 @@ window.bioreactor = {
 		setTimeout(function(){$('.kill').remove()},100);
 		setTimeout(function(){$('#box').removeClass('boom')},100);
 		bioreactor.creatures = [];
+	},
+	start_stalking: function(elem) {
+		
+	},
+	stalk: function() {
+		if(typeof console == 'undefined') {return;}
+		console.log(bioreactor.stalking.health);
 	}
 	
 	
@@ -172,6 +185,26 @@ window.bioreactor = {
 		if(e.which == 69) {
 			bioreactor.ele();
 		}
+	});
+	
+	$('#box').click(function(evt){
+	  console.log('clicked');
+		if(!$(evt.target).hasClass('hexozoa')) {return}
+		console.log('clicked a hexozoa',evt.target);
+		
+		var i = 0, 
+		    c = bioreactor.creatures, 
+		    len = c.length,
+		    tID = $(evt.target).attr('id');
+		    
+		for(i; i<len; i++){
+		  if(c[i].id == tID){
+		    bioreactor.stalking = bioreactor.creatures[i];
+				break;
+		  }
+		}
+		bioreactor.stalk();
+		
 	});
 
 });
