@@ -32,6 +32,7 @@ function Hexozoa(hexgenes,coord) {
 	  }
 	  
 		return ($('<i id="'+ self.id +'" class="hexozoa" style="background-color:#'+ self.color +';"></i>').css({
+		  // '-webkit-box-shadow': function(){return '0 0 6px 2px #'+self.color;},
 			'background-color': function(){return '#'+self.color;},
 			'top': function(){return t },
 			'left': function(){return l }
@@ -45,7 +46,7 @@ Hexozoa.prototype.swim = function(radian){
 	var top = parseInt($(this.element).css('top'));
 	var left = parseInt($(this.element).css('left'));
 	
-	var info = this.interpret(this.hexgenes[1]);//interpreting on each swim call is really inefficient 
+	var info = this.interpretGene(this.hexgenes[1]);//interpretGeneing on each swim call is really inefficient 
 	var dur = (Math.random() * 200) + info.g;
 	var dist = parseInt(info.b/25,10);
 	var self = this;
@@ -128,18 +129,19 @@ Hexozoa.prototype.spawn = function(){
   var pos = $(this.element).position();
   var coord = {x:pos.left, y:pos.top};
   var len = c.length;
-  var hG = '#' + this.hexgenes.join('#');
-  //loop through genes and mutate slightly
-  //bioreactor.genesis(2);
-  //bioreactor.stalking.spawn();
-  //r = Math.random();
-  //d = parseInt(r * 1000,10);
-  //d.toString(3);
-  console.log('hG',hG);
+  //todo: call copyGene in loop
+  var newGenes = [];
+  for(var i=0;i<this.hexgenes.length;i++) {
+    newGenes.push( this.copyGene(this.hexgenes[i]) );
+  }
+
+  //todo: pass copied genes into constructor
+  //var hG = '#' + this.hexgenes.join('#');
+  var hG = '#' + newGenes.join('#');
   c[len] = new Hexozoa(hG,coord);
 	c[len].swim();
 }
-Hexozoa.prototype.interpret = function(hexgene) {
+Hexozoa.prototype.interpretGene = function(hexgene) {
 	var array = hexgene.split('');
 	var rgb = {
 		'r': parseInt(''+array[0]+array[1], 16),
@@ -147,6 +149,76 @@ Hexozoa.prototype.interpret = function(hexgene) {
 		'b': parseInt(''+array[4]+array[5], 16)
 	}
 	return rgb;
+}
+Hexozoa.prototype.copyGene = function(hexgene) {
+  
+  var hG = this.interpretGene(hexgene);
+  //loop through genes and mutate slightly
+  var rand = Math.random()*10000000000000001;//the full int //the seed of it all.
+  var ter = rand.toString(3);//get a base three number for mutating up or down by 1.
+      ter = ter.substr(0,9);// a nine digit tertiary number
+
+  console.log('hexgenes',this.hexgenes);
+  console.log('orgHex',hexgene);
+  console.log('orgRGB', hG.r +' '+ hG.g +' '+ hG.b);
+  var rand_str = rand.toString(10);
+  var zeros = '000';//string of zeros for prepending to values
+  var r_str = hG.r.toString(10);// change int value 45 to '45' string for manipulation
+      r_str = zeros.substr(0,3 - r_str.length) + r_str;//prepend correct number of zeros to string to always make it a three digit number '045'
+  var g_str = hG.g.toString(10);
+      g_str = zeros.substr(0,3 - g_str.length) + g_str;
+  var b_str = hG.b.toString(10);
+      b_str = zeros.substr(0,3 - b_str.length) + b_str;
+  console.log('strRGB', r_str +' '+ g_str +' '+ b_str);
+  console.log('strHex', (parseInt(r_str,10)).toString(16) +' '+ (parseInt(g_str,10)).toString(16) +' '+ (parseInt(b_str,10)).toString(16));
+  console.log('before and after match', hexgene ==  (parseInt(r_str,10)).toString(16) + (parseInt(g_str,10)).toString(16) + (parseInt(b_str,10)).toString(16));    
+  
+
+/*=======================================*/ 
+    var r_copy = g_copy = b_copy = '';
+  for(var i=0;i<3;i++) {
+    
+    console.log(('r_str.charAt('+i+') == rand_str.charAt('+i+')'),(r_str.charAt(i) +' == '+ rand_str.charAt(i)));
+    if(r_str.charAt(i) == rand_str.charAt(i)) {
+      var x = parseInt(r_str.charAt(i),10);
+      var y = ( parseInt(ter.charAt(i),10)-1 );
+      console.log(r_copy +' += '+x+' + '+y );
+      r_copy += x + y  ;
+    } else {
+      console.log(r_copy +' += '+ r_str.charAt(i) );
+      r_copy += r_str.charAt(i);
+    }
+    /*************************************************/
+    console.log(('g_str.charAt('+i+') == rand_str.charAt('+i+')'),(g_str.charAt(i) +' == '+ rand_str.charAt(i)));
+    if(g_str.charAt(i) == rand_str.charAt(i)) {
+      var x = parseInt(g_str.charAt(i),10);
+      var y = ( parseInt(ter.charAt(i),10)-1 );
+      console.log(g_copy +' += '+x+' + '+y );
+      g_copy += x + y  ;
+    } else {
+      console.log(g_copy +' += '+ g_str.charAt(i) );
+      g_copy += g_str.charAt(i);
+    }
+    /*************************************************/
+    console.log(('b_str.charAt('+i+') == rand_str.charAt('+i+')'),(b_str.charAt(i) +' == '+ rand_str.charAt(i)));
+    if(b_str.charAt(i) == rand_str.charAt(i)) {
+      var x = parseInt(b_str.charAt(i),10);
+      var y = ( parseInt(ter.charAt(i),10)-1 );
+      console.log(b_copy +' += '+x+' + '+y );
+      b_copy += x + y  ;
+    } else {
+      console.log(b_copy +' += '+ b_str.charAt(i) );
+      b_copy += b_str.charAt(i);
+    }
+        
+      // r_copy += r_str.charAt(i) == rand_str.charAt(i) ? ( r_str.charAt(i)+(parseInt(ter.charAt(i),10)-1) ) : r_str.charAt(i);
+      // g_copy += g_str.charAt(i) == rand_str.charAt(i+3) ? ( g_str.charAt(i)+(parseInt(ter.charAt(i+3),10)-1) ) : g_str.charAt(i);
+      // b_copy += b_str.charAt(i) == rand_str.charAt(i+6) ? ( b_str.charAt(i)+(parseInt(ter.charAt(i+6),10)-1) ) : b_str.charAt(i);
+    }
+  console.log('copied RGB', (parseInt(r_copy,10) +' '+ parseInt(g_copy,10) +' '+ parseInt(b_copy,10)))
+  return  (parseInt(r_copy,10)).toString(16) + (parseInt(g_copy,10)).toString(16) + (parseInt(b_copy,10)).toString(16);
+  //return (parseInt(r_str,10)).toString(16) + (parseInt(g_str,10)).toString(16) + (parseInt(b_str,10)).toString(16);
+  
 }
 Hexozoa.prototype.eat = function(){
 	//eat to increase health
@@ -161,10 +233,18 @@ window.bioreactor = {
 	creatures: [],
 	stalking: null,
 	randomHexgene: function() {
-			return '#'+ (parseInt(Math.random() * 255, 10)).toString(16) + (parseInt(Math.random() * 255, 10)).toString(16) + (parseInt(Math.random() * 255, 10)).toString(16);
+	    var zeros = '000';//string of zeros for prepending to values
+      var r_str = (parseInt(Math.random() * 255, 10)).toString(16);
+          r_str = zeros.substr(0,2 - r_str.length) + r_str;
+      var g_str = (parseInt(Math.random() * 255, 10)).toString(16);
+          g_str = zeros.substr(0,2 - g_str.length) + g_str;
+      var b_str = (parseInt(Math.random() * 255, 10)).toString(16);
+          b_str = zeros.substr(0,2 - b_str.length) + b_str;
+	    console.log('#'+'|'+ r_str +'|'+ g_str +'|'+ b_str)
+			return '#'+ r_str + g_str + b_str;
 	},
 	genesis: function(seedSize) {
-		seedSize = (typeof seedSize == 'number') ? seedSize : 20;
+		seedSize = (typeof seedSize == 'number') ? seedSize : 10;
 		seedSize = bioreactor.creatures.length + seedSize + 1;
 		for(var i=bioreactor.creatures.length; i<seedSize; i++) {
 
@@ -179,21 +259,57 @@ window.bioreactor = {
 	},
 	ele: function() {/* Extinction-Level Event */
 		$(bioreactor.creatures).each(function(index){
-			bioreactor.creatures[index].element.addClass('kill');
-			delete bioreactor.creatures[index].element;
+		  if(!bioreactor.creatures[index].dead){
+		    bioreactor.creatures[index].element.addClass('kill');
+  			delete bioreactor.creatures[index].element;
+		  }
 		});
 
 		$('#box').addClass('boom');
 		setTimeout(function(){$('.kill').remove()},100);
 		setTimeout(function(){$('#box').removeClass('boom')},100);
 		bioreactor.creatures = [];
+		bioreactor.stalking = null;
 	},
 	start_stalking: function(elem) {
-		
+		if(!$(elem).hasClass('hexozoa')) {return}//if you didnt click on a bug get out.
+		this.stop_stalking();
+   	var i = 0, 
+   	    c = bioreactor.creatures, 
+   	    len = c.length,
+   	    elemID = $(elem).attr('id');
+   	for(i; i<len; i++){
+   	  if(!c[i].dead && c[i].id == elemID){
+   	    // bioreactor.stalking = c[i];
+   	    bioreactor.stalking = i;
+   	    $('#box').addClass('tagged')
+   	    setTimeout(function(){$('#box').removeClass('tagged')},50);
+   	    $('#btn_spawn, #btn_kill').removeAttr('disabled' );
+       	bioreactor.stalk();
+   			break;
+   	  }
+   	}
+
 	},
 	stalk: function() {
 		if(typeof console == 'undefined') {return;}
-		console.log(bioreactor.stalking.health);
+    // console.log(bioreactor.stalking.health);
+    console.log(bioreactor.creatures[bioreactor.stalking].health);
+	},
+	stop_stalking: function() {
+	  bioreactor.stalking = null;
+	  $('#btn_spawn, #btn_kill').attr('disabled',true);
+	},
+	kill: function() {
+	  var s = bioreactor.stalking;
+	  if(s !== null) {
+	    var c = bioreactor.creatures;
+      delete c[s].element;
+      $('#'+c[s].id).remove();
+      delete c[s];
+      c[s] = {dead:true}; 
+      bioreactor.stop_stalking();
+    }
 	},
 	approx_distance: function(dx,dy )
   {//http://www.flipcode.com/archives/Fast_Approximate_Distance_Functions.shtml
@@ -223,7 +339,8 @@ window.bioreactor = {
 //interface
 $('#btn_genesis').click(function(){bioreactor.genesis()});
 $('#btn_ele').click(bioreactor.ele);
-$('#btn_spawn').click(function(){bioreactor.stalking.spawn();});
+$('#btn_spawn').click(function(){ if(bioreactor.stalking !== null) {(bioreactor.creatures[bioreactor.stalking]).spawn();} });
+$('#btn_kill').click(function(){ if(bioreactor.stalking !== null) {bioreactor.kill();} });
 
 $(document).keydown(function(e){
   var btn;
@@ -237,8 +354,11 @@ $(document).keydown(function(e){
     case 69://e
       btn = $('#btn_ele');
     break;
+    case 75://k
+      btn = $('#btn_kill');
+    break;
     default:
-      if(console){console.log(e.which)}
+      if(console){console.log('The "'+ String.fromCharCode(e.which) +'" ('+ e.which +') key has been pressed, but its not one of the keys I care about.')}
     break;
   }
   if(typeof btn != 'undefined'){btn.trigger('click');}
@@ -246,20 +366,7 @@ $(document).keydown(function(e){
 	
 		
 $('#box').click(function(evt){
-  console.log('clicked');
-	if(!$(evt.target).hasClass('hexozoa')) {return}
-	console.log('clicked a hexozoa',evt.target);
-	var i = 0, 
-	    c = bioreactor.creatures, 
-	    len = c.length,
-	    tID = $(evt.target).attr('id');
-	for(i; i<len; i++){
-	  if(c[i].id == tID){
-	    bioreactor.stalking = bioreactor.creatures[i];
-			break;
-	  }
-	}
-	bioreactor.stalk();
+ bioreactor.start_stalking(evt.target);
 });
 	
 	
