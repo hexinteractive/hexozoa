@@ -26,9 +26,16 @@ title{display:block; height:45px; padding:0px 2em; background-color:#fc0; margin
 
 #box.tagged {
   border:2px solid #fff;
-	background-color:#333;
+	background-color:#222;
 }
 
+#box.tagged .hexozoa {
+  visibility:hidden;
+}
+
+#box.tagged .hexozoa.tagged {
+  visibility:visible;
+}
 
 .hexozoa {
   /*-webkit-box-shadow:0 0 10px #fff;*/

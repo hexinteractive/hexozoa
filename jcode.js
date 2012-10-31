@@ -210,15 +210,27 @@ Hexozoa.prototype.copyGene = function(hexgene) {
       console.log(b_copy +' += '+ b_str.charAt(i) );
       b_copy += b_str.charAt(i);
     }
-        
-      // r_copy += r_str.charAt(i) == rand_str.charAt(i) ? ( r_str.charAt(i)+(parseInt(ter.charAt(i),10)-1) ) : r_str.charAt(i);
-      // g_copy += g_str.charAt(i) == rand_str.charAt(i+3) ? ( g_str.charAt(i)+(parseInt(ter.charAt(i+3),10)-1) ) : g_str.charAt(i);
-      // b_copy += b_str.charAt(i) == rand_str.charAt(i+6) ? ( b_str.charAt(i)+(parseInt(ter.charAt(i+6),10)-1) ) : b_str.charAt(i);
-    }
-  console.log('copied RGB', (parseInt(r_copy,10) +' '+ parseInt(g_copy,10) +' '+ parseInt(b_copy,10)))
-  return  (parseInt(r_copy,10)).toString(16) + (parseInt(g_copy,10)).toString(16) + (parseInt(b_copy,10)).toString(16);
-  //return (parseInt(r_str,10)).toString(16) + (parseInt(g_str,10)).toString(16) + (parseInt(b_str,10)).toString(16);
-  
+  }
+
+  console.log('copied RGB', (parseInt(r_copy,10) +' '+ parseInt(g_copy,10) +' '+ parseInt(b_copy,10)));
+
+  //todo: fix 255 max problem
+  // do i just say that numbers greater than 255 returns 255
+  // or subtract 255 from the larger number
+  // or some other math?
+
+  r_copy = (parseInt(r_copy,10)).toString(16);
+  g_copy = (parseInt(g_copy,10)).toString(16);
+  b_copy = (parseInt(b_copy,10)).toString(16);
+
+  r_copy = zeros.substr(0,2 - r_copy.length) + r_copy;
+  g_copy = zeros.substr(0,2 - g_copy.length) + g_copy;
+  b_copy = zeros.substr(0,2 - b_copy.length) + b_copy;
+
+  console.log('copied hex', (r_copy + g_copy + b_copy) );
+  console.log('====================================');
+  return (r_copy + g_copy + b_copy);
+
 }
 Hexozoa.prototype.eat = function(){
 	//eat to increase health
@@ -246,11 +258,12 @@ window.bioreactor = {
 	genesis: function(seedSize) {
 		seedSize = (typeof seedSize == 'number') ? seedSize : 10;
 		seedSize = bioreactor.creatures.length + seedSize + 1;
+		if(console) { console.log('genesis seed size: ', seedSize); }
 		for(var i=bioreactor.creatures.length; i<seedSize; i++) {
 
 			var numberOfGenes = 2;
 			var hexgenes = [];
-			for(var hG=0; hG<=1; hG++) {
+			for(var hG=0; hG  <=1; hG++) {
 				hexgenes[hG] = bioreactor.randomHexgene();
 			}
 			bioreactor.creatures[i] = new Hexozoa(hexgenes.join(''));
@@ -258,6 +271,7 @@ window.bioreactor = {
 		}
 	},
 	ele: function() {/* Extinction-Level Event */
+	  if(console) { console.log('Extinction-Level Event killed ', bioreactor.creatures.length +' hexozoas'); }
 		$(bioreactor.creatures).each(function(index){
 		  if(!bioreactor.creatures[index].dead){
 		    bioreactor.creatures[index].element.addClass('kill');
@@ -269,7 +283,7 @@ window.bioreactor = {
 		setTimeout(function(){$('.kill').remove()},100);
 		setTimeout(function(){$('#box').removeClass('boom')},100);
 		bioreactor.creatures = [];
-		bioreactor.stalking = null;
+		bioreactor.stop_stalking();
 	},
 	start_stalking: function(elem) {
 		if(!$(elem).hasClass('hexozoa')) {return}//if you didnt click on a bug get out.
@@ -282,14 +296,15 @@ window.bioreactor = {
    	  if(!c[i].dead && c[i].id == elemID){
    	    // bioreactor.stalking = c[i];
    	    bioreactor.stalking = i;
-   	    $('#box').addClass('tagged')
-   	    setTimeout(function(){$('#box').removeClass('tagged')},50);
-   	    $('#btn_spawn, #btn_kill').removeAttr('disabled' );
+		$('#box').addClass('tagged');
+        $(elem).addClass('tagged');
+        setTimeout(function(){$('#box').removeClass('tagged')},100);
+        $('#btn_spawn, #btn_kill').removeAttr('disabled' );
        	bioreactor.stalk();
    			break;
    	  }
    	}
-
+	$('#stalk').css('border-color', '#'+(bioreactor.creatures[bioreactor.stalking]).color );
 	},
 	stalk: function() {
 		if(typeof console == 'undefined') {return;}
@@ -297,8 +312,10 @@ window.bioreactor = {
     console.log(bioreactor.creatures[bioreactor.stalking].health);
 	},
 	stop_stalking: function() {
+	  //$(elem).removeClass('tagged');
 	  bioreactor.stalking = null;
 	  $('#btn_spawn, #btn_kill').attr('disabled',true);
+	  $('#stalk').css('border-color', '');
 	},
 	kill: function() {
 	  var s = bioreactor.stalking;
